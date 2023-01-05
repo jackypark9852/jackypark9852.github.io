@@ -33,6 +33,9 @@ const lightHelper = new THREE.PointLightHelper(pointLight);
 const gridHelper = new THREE.GridHelper(200, 50);
 scene.add(pointLight, ambientLight, lightHelper, gridHelper);
 
+const wallTexture = new THREE.TextureLoader().load("textures/space.jpg");
+scene.background = wallTexture;
+
 const controls = new OrbitControls(camera, renderer.domElement);
 
 function addStar() {
