@@ -1,25 +1,16 @@
 import "./style.css";
 
 import * as THREE from "three";
-import { AmbientLight, PointLightHelper } from "three";
+import { AmbientLight, AnimationObjectGroup, PointLightHelper } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { randFloatSpread } from "three/src/math/MathUtils";
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-const renderer = new THREE.WebGLRenderer({
-  canvas: document.querySelector("#bg"),
-});
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
+const canvas = document.querySelector("#bg");
+const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
 camera.position.setZ(30);
 
-renderer.render(scene, camera);
+const renderer = new THREE.WebGLRenderer({ canvas });
 
 const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
 const material = new THREE.MeshStandardMaterial({ color: 0xff6347 });
@@ -38,6 +29,17 @@ scene.background = wallTexture;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+
 function addStar() {
   const geometry = new THREE.SphereGeometry(0.25, 24, 24);
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
@@ -49,17 +51,19 @@ function addStar() {
   star.position.set(x, y, z);
   scene.add(star);
 }
-Array(200).fill().forEach(addStar);
 
 function animate() {
-  requestAnimationFrame(animate);
   torus.rotation.x += 0.01;
   torus.rotation.y += 0.005;
   torus.rotation.z += 0.01;
 
   controls.update();
+  camera.aspect = canvas.clientWidth / canvas.clientHeight;
+  camera.updateProjectionMatrix();
+  resizeRendererToDisplaySize(renderer);
   renderer.render(scene, camera);
+  requestAnimationFrame(animate);
 }
 
-animate();
-console.log(Array(10).fill());
+Array(200).fill().forEach(addStar);
+requestAnimationFrame(animate);
